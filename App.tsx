@@ -1,11 +1,13 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, Suspense, lazy } from 'react';
 import { Client, Pet, Appointment, Page, AppointmentStatus, Product, Service, Sale } from './types';
 import { Sidebar } from './components/Sidebar';
-import { Dashboard } from './components/Dashboard';
-import { Clients } from './components/Clients';
-import { Appointments } from './components/Appointments';
-import { Inventory } from './components/Inventory';
 import { PawIcon } from './components/icons';
+
+// Lazy load page components
+const Dashboard = lazy(() => import('./components/Dashboard').then(module => ({ default: module.Dashboard })));
+const Clients = lazy(() => import('./components/Clients').then(module => ({ default: module.Clients })));
+const Appointments = lazy(() => import('./components/Appointments').then(module => ({ default: module.Appointments })));
+const Inventory = lazy(() => import('./components/Inventory').then(module => ({ default: module.Inventory })));
 
 const API_URL = '/api';
 
@@ -145,7 +147,9 @@ function App() {
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
             </button>
         </header>
-        {renderPage()}
+        <Suspense fallback={<div className="p-6">Carregando...</div>}>
+          {renderPage()}
+        </Suspense>
       </main>
     </div>
   );

@@ -7,15 +7,15 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
-*.local
+# Node/Vite
+node_modules/
+dist/
+dist-ssr/
 
-# Editor directories and files
+# Editor/IDE
 .vscode/*
 !.vscode/extensions.json
-.idea
+.idea/
 .DS_Store
 *.suo
 *.ntvs*
@@ -23,23 +23,28 @@ dist-ssr
 *.sln
 *.sw?
 
-# Python virtual environment
+# Python virtual environments
 venv/
 .venv/
 env/
 
-# Python cache and artifacts
+# Python cache
 __pycache__/
 *.pyc
+*.pyo
+*.pyd
 .pytest_cache/
 
-# Local database files
+# Databases
 *.db
 *.sqlite
 *.sqlite3
+sql_app.db
 
 # Environment variables
-# Ignore all .env files
 .env*
-# Except for .env.example
 !.env.example
+
+# Build/metadata
+*.egg-info/
+.metadata/

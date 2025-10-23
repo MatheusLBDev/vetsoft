@@ -5,12 +5,12 @@ from sqlalchemy.orm import sessionmaker
 
 SQLALCHEMY_DATABASE_URL = os.getenv(
     "DATABASE_URL",
-    "postgresql://user:password@host:port/database"  # fallback local
+    "postgresql://user:password@host:port/database"  
 )
 
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL,
-    connect_args={"sslmode": "require"}  # obrigatório para Supabase
+    connect_args={"sslmode": "require"}  
 )
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
