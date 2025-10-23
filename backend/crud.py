@@ -123,13 +123,13 @@ def delete_service(db: Session, service_id: int):
     return db_service
 
 def get_sales(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(models.Sale).options(joinedload(models.Sale.items)).offset(skip).limit(limit).all()
+    return db.query(models.Sale).options(joinedload(models.Sale.items)).order_by(models.Sale.date.desc()).offset(skip).limit(limit).all()
 
 def get_sales_count(db: Session):
     return db.query(models.Sale).count()
 
 def create_sale(db: Session, sale: schemas.SaleCreate):
-    # Check for stock availability first
+
     for item in sale.items:
         if item.product_id:
             db_product = get_product(db, item.product_id)
@@ -138,26 +138,22 @@ def create_sale(db: Session, sale: schemas.SaleCreate):
             if db_product.stock < item.quantity:
                 raise HTTPException(status_code=400, detail=f"Not enough stock for product {db_product.name}. Available: {db_product.stock}, Required: {item.quantity}")
 
-    # Create sale and items in one transaction
     db_sale = models.Sale(total=sale.total, date=sale.date)
     db.add(db_sale)
-    db.flush()  # Use flush to get the db_sale.id without committing
+    db.flush() 
 
     for item in sale.items:
         db_item = models.SaleItem(**item.model_dump(), sale_id=db_sale.id)
         db.add(db_item)
-        # Update product stock
+
         if item.product_id:
-            # We already fetched the product and checked for stock
+
             db_product = get_product(db, item.product_id)
             if db_product:
                 db_product.stock -= item.quantity
 
     db.commit()
-
-    # Refresh to get the final state including items
     db.refresh(db_sale)
-    # Eager load items for the response
     db_sale = db.query(models.Sale).options(joinedload(models.Sale.items)).filter(models.Sale.id == db_sale.id).first()
 
     return db_sale

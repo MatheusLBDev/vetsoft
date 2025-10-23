@@ -27,7 +27,7 @@ def get_sales_forecast(db: Session = Depends(get_db)):
     print(sales_data)
     try:
         df = pd.DataFrame(sales_data)
-        df['date'] = pd.to_datetime(df['date'], format='ISO8601')
+        df['date'] = pd.to_datetime(df['date'], format='ISO8601', utc=True)
     except ValueError as e:
         return {"message": f"Error parsing dates: {e}"}
     df = df.set_index('date')
@@ -66,8 +66,8 @@ def get_sales_forecast(db: Session = Depends(get_db)):
                 suggestions.append({
                     "product_name": product.name,
                     "current_stock": product.stock,
-                    "estimated_sales_30_days": round(estimated_sales, 2),
-                    "suggestion": f"Recomendamos reordenar {round(estimated_sales - product.stock)} unidades."
+                    "estimated_sales_30_days": round(estimated_sales),
+                    "suggestion": f"Estoque recomendado: {round(estimated_sales - product.stock)} unidades."
                 })
 
     # Prepare forecast data for response

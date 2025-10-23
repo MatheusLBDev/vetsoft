@@ -178,7 +178,7 @@ const OverviewTab: React.FC<InventoryProps> = ({ products, sales }) => {
 
 
 // Generic CRUD Tab Component
-const CrudTab = <T extends { id: string; name: string; description: string; price: number; stock?: number }>({
+const CrudTab = <T extends { id: number; name: string; description: string; price: number; stock?: number }>({
     title,
     items,
     setItems,
@@ -220,7 +220,7 @@ const CrudTab = <T extends { id: string; name: string; description: string; pric
         }
     };
 
-    const handleDelete = async (id: string) => {
+    const handleDelete = async (id: number) => {
         if(window.confirm(`Tem certeza que deseja excluir este ${itemType}?`)) {
             const response = await fetch(`${API_URL}${endpoint}/${id}`, { method: 'DELETE' });
             if (response.ok) {
