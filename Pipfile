@@ -4,16 +4,15 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-python-dotenv = "*"
 fastapi = "*"
 uvicorn = "*"
 sqlalchemy = "*"
 pydantic = "*"
 python-multipart = "*"
-npm = "*"
 pandas = "*"
 statsmodels = "*"
 psycopg2-binary = "*"
+python-dotenv = "*"
 
 [dev-packages]
 
