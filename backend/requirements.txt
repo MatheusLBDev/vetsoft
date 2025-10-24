@@ -4,5 +4,4 @@ sqlalchemy
 pydantic
 python-multipart
 polars
-statsmodels
 psycopg2-binary

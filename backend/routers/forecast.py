@@ -4,7 +4,6 @@ from collections import defaultdict
 import crud
 from database import SessionLocal
 import polars as pl
-from statsmodels.tsa.arima.model import ARIMA
 from datetime import timedelta
 
 router = APIRouter()
@@ -24,7 +23,6 @@ def get_sales_forecast(db: Session = Depends(get_db)):
 
     # Prepare data for time series analysis of total sales
     sales_data = [{"date": sale.date, "total": sale.total} for sale in sales]
-    print(sales_data)
     try:
         df = pl.from_dicts(sales_data)
         df = df.with_columns(pl.col("date").str.to_datetime())
@@ -36,13 +34,19 @@ def get_sales_forecast(db: Session = Depends(get_db)):
     if len(df_resampled) < 14:  # Need at least 2 weeks of data for a meaningful forecast
         return {"message": "Não há dados de vendas suficientes para uma previsão confiável."}
 
-    # Fit a simple ARIMA model for total sales
-    # The ARIMA model from statsmodels works well with pandas Series.
-    series = df_resampled.to_pandas().set_index('date')['total']
-    model = ARIMA(series, order=(5, 1, 0))
-    model_fit = model.fit()
-    forecast = model_fit.forecast(steps=30)
-    total_forecast_30_days = sum(forecast)
+    # Calculate a 7-day Exponential Moving Average (EMA)
+    span = 7
+    df_with_ema = df_resampled.with_columns(
+        pl.col("total").ewm_mean(span=span).alias("ema")
+    )
+
+    # For the forecast, we'll take the last EMA value and project it forward.
+    last_ema = df_with_ema.select(pl.last("ema")).item()
+    if last_ema is None:
+        last_ema = 0
+    
+    forecast_values = [last_ema] * 30
+    total_forecast_30_days = sum(forecast_values)
 
     # Calculate product proportions from historical sales
     product_sales = defaultdict(int)
@@ -78,9 +82,9 @@ def get_sales_forecast(db: Session = Depends(get_db)):
     forecast_data = {
         "forecast": [
             {"date": date.strftime('%Y-%m-%d'), "predicted_sales": value}
-            for date, value in zip(forecast_dates, forecast)
+            for date, value in zip(forecast_dates, forecast_values)
         ],
-        "summary": "Previsão de vendas para os próximos 30 dias.",
+        "summary": "Previsão de vendas para os próximos 30 dias (baseada em Média Móvel Exponencial).",
         "inventory_suggestions": suggestions
     }
 
