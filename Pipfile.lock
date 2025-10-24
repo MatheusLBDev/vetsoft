@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "3a2d53e3ec6bfb0d89c2afcfa2327d1fb97ec8ad82271ea27c249c05815b15fd"
+            "sha256": "fb5947ffa87fa7fe7c192f512c5cafbdc754ef04b0f705d32dee97aa4216a4a0"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -230,6 +230,28 @@
             ],
             "markers": "python_version >= '3.6'",
             "version": "==1.0.2"
+        },
+        "polars": {
+            "hashes": [
+                "sha256:40d2f357b4d9e447ad28bd2c9923e4318791a7c18eb68f31f1fbf11180f41391",
+                "sha256:5de5f871027db4b11bcf39215a2d6b13b4a80baf8a55c5862d4ebedfd5cd4013"
+            ],
+            "index": "pypi",
+            "markers": "python_version >= '3.9'",
+            "version": "==1.34.0"
+        },
+        "polars-runtime-32": {
+            "hashes": [
+                "sha256:2501d6b29d9001ea5ea2fd9b598787e10ddf45d8c4a87c2bead75159e8a15711",
+                "sha256:2878f9951e91121afe60c25433ef270b9a221e6ebf3de5f6642346b38cab3f03",
+                "sha256:79e4d696392c6d8d51f4347f0b167c52eef303c9d87093c0c68e8651198735b7",
+                "sha256:93fa51d88a2d12ea996a5747aad5647d22a86cce73c80f208e61f487b10bc448",
+                "sha256:ebe6f865128a0d833f53a3f6828360761ad86d1698bceb22bef9fd999500dc1c",
+                "sha256:f9ed1765378dfe0bcd1ac5ec570dd9eab27ea728bbc980cc9a76eebc55586559",
+                "sha256:fbc329c7d34a924228cc5dcdbbd4696d94411a3a5b15ad8bb868634c204e1951"
+            ],
+            "markers": "python_version >= '3.9'",
+            "version": "==1.34.0"
         },
         "psycopg2-binary": {
             "hashes": [

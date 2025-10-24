@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from collections import defaultdict
 import crud
 from database import SessionLocal
-import pandas as pd
+import polars as pl
 from statsmodels.tsa.arima.model import ARIMA
 from datetime import timedelta
 
@@ -26,18 +26,20 @@ def get_sales_forecast(db: Session = Depends(get_db)):
     sales_data = [{"date": sale.date, "total": sale.total} for sale in sales]
     print(sales_data)
     try:
-        df = pd.DataFrame(sales_data)
-        df['date'] = pd.to_datetime(df['date'], format='ISO8601', utc=True)
-    except ValueError as e:
+        df = pl.from_dicts(sales_data)
+        df = df.with_columns(pl.col("date").str.to_datetime())
+    except Exception as e:
         return {"message": f"Error parsing dates: {e}"}
-    df = df.set_index('date')
-    df = df.resample('D').sum().fillna(0)  # Resample to daily sales, fill missing days with 0
+    
+    df_resampled = df.sort("date").group_by_dynamic("date", every="1d").agg(pl.col("total").sum()).fill_null(0)
 
-    if len(df) < 14:  # Need at least 2 weeks of data for a meaningful forecast
+    if len(df_resampled) < 14:  # Need at least 2 weeks of data for a meaningful forecast
         return {"message": "Não há dados de vendas suficientes para uma previsão confiável."}
 
     # Fit a simple ARIMA model for total sales
-    model = ARIMA(df['total'], order=(5, 1, 0))
+    # The ARIMA model from statsmodels works well with pandas Series.
+    series = df_resampled.to_pandas().set_index('date')['total']
+    model = ARIMA(series, order=(5, 1, 0))
     model_fit = model.fit()
     forecast = model_fit.forecast(steps=30)
     total_forecast_30_days = sum(forecast)
@@ -71,7 +73,8 @@ def get_sales_forecast(db: Session = Depends(get_db)):
                 })
 
     # Prepare forecast data for response
-    forecast_dates = [df.index[-1] + timedelta(days=i) for i in range(1, 31)]
+    last_date = df_resampled.select(pl.col("date")).max().item()
+    forecast_dates = [last_date + timedelta(days=i) for i in range(1, 31)]
     forecast_data = {
         "forecast": [
             {"date": date.strftime('%Y-%m-%d'), "predicted_sales": value}

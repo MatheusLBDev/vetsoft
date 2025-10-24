@@ -9,10 +9,10 @@ uvicorn = "*"
 sqlalchemy = "*"
 pydantic = "*"
 python-multipart = "*"
-pandas = "*"
 statsmodels = "*"
 psycopg2-binary = "*"
 python-dotenv = "*"
+polars = "*"
 
 [dev-packages]
 

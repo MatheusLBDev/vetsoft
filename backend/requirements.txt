@@ -3,6 +3,6 @@ uvicorn
 sqlalchemy
 pydantic
 python-multipart
-pandas
+polars
 statsmodels
 psycopg2-binary
